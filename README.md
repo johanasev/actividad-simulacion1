@@ -2,8 +2,9 @@
 
 |Integrante|correo|usuario github|
 |---|---|---|
-|Nombre completo integrante 1|correo integrante 1|gihub user integrante 1|
-|Nombre completo integrante 2|correo integrante 2|gihub user integrante 2|
+|Johana Liseth Sevillano Herrera|johana.sevillano@udea.edu.co|johanasev|
+|Angi Sirley Hoyos Ruiz|asirley.hoyos@udea.edu.co|ange-lical14|
+|Angie Paola Yarce Gómez|angie.yarceg@udea.edu.co|angiegz2|
 
 ## Instrucciones
 
@@ -24,7 +25,9 @@ This program, [`process-run.py`](process-run.py), allows you to see how process 
    
    <details>
    <summary>Answer</summary>
-   Coloque aqui su respuerta
+   Since we have 10 processes and no input/output instruction, the CPU utilization should be 100% of the execution time, and we know this because when we use the -c and -p flags, they show us the statistics and the usage time.
+
+
    </details>
    <br>
 
@@ -32,7 +35,7 @@ This program, [`process-run.py`](process-run.py), allows you to see how process 
    
    <details>
    <summary>Answer</summary>
-   Coloque aqui su respuerta
+   The time it takes for both processes to complete is 11 cycles. 6 in CPU (54.55%) and 5 in IO (45.45%)
    </details>
    <br>
 
@@ -40,7 +43,7 @@ This program, [`process-run.py`](process-run.py), allows you to see how process 
    
    <details>
    <summary>Answer</summary>
-   Coloque aqui su respuerta
+   Processes are executed in fewer cycle times. Yes, the change in order matters because the process performing the IO was executed first and blocked quickly, making it switch faster to the CPU process, reducing the execution period and increasing CPU utilization, improving overall system performance.
    </details>
    <br>
 
@@ -48,7 +51,7 @@ This program, [`process-run.py`](process-run.py), allows you to see how process 
    
    <details>
    <summary>Answer</summary>
-   Coloque aqui su respuerta
+    Due to the use of SWITCH ON END, the execution time is extended to 11 cycles, which is unnecessarily long and less efficient, since we force the CPU to execute the IO processes first until they are completely finished, and once finished, continue with the other processes, i.e., the CPU processes.
    </details>
    <br>
 
@@ -56,7 +59,7 @@ This program, [`process-run.py`](process-run.py), allows you to see how process 
    
    <details>
    <summary>Answer</summary>
-   Coloque aqui su respuerta
+   **Answer:** Due to the use of the SWITCH ON IO, the answer obtained is the same as the answer to question 3, because the SWITCH ON IO flag is preconfigured, i.e., regardless of whether it is used or not, the IO processes will always be executed first, as long as they are in the command first. Example: 1:0,4:100
    </details>
    <br>
 
@@ -64,7 +67,7 @@ This program, [`process-run.py`](process-run.py), allows you to see how process 
    
    <details>
    <summary>Answer</summary>
-   Coloque aqui su respuerta
+   **Answer:** When we execute this combination of processes, which include the SIWTCH ON IO and IO RUN LATER flags, we lose the execution priority of the IO processes as a block and we obtain a partial execution, in this way, 1 of 3 IO processes is executed, and when identifying that a CPU process is in execution, the IO is put in standby and executes the CPU, this thanks to the IO RUN LATER flag. So, we can say that the resources are not being used efficiently, since the CPU was idle for quite some time.
    </details>
    <br>
 
@@ -72,7 +75,7 @@ This program, [`process-run.py`](process-run.py), allows you to see how process 
    
    <details>
    <summary>Answer</summary>
-   Coloque aqui su respuerta
+    With respect to the previous execution, the results differ, since the LATER RUN puts the IO processes on hold (which affects the execution time and does not make good use of resources), while the IMIMMEDIATE RUN, being an immediate process, takes the IO processes as a priority (without leaving them on hold), and unless the CPU processes encounter a io_done, they will not stop, but will continue to run simultaneously, therefore, this process turns out to be more efficient. We can consider this a good practice because there are always processes running, which improves response time (evidenced by the reduction of time cycles), makes the most of the CPU and also allows IO processes not to have to wait.
    </details>
    <br>
 
