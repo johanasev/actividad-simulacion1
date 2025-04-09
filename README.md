@@ -23,6 +23,55 @@ This program, [`process-run.py`](process-run.py), allows you to see how process 
 
 1. Run `process-run.py` with the following flags: `-l 5:100,5:100`. What should the CPU utilization be (e.g., the percent of time the CPU is in use?) Why do you know this? Use the `-c` and `-p` flags to see if you were right.
    
+  <details>
+  <summary>Results</summary>
+  <pre>
+<p><strong><code>!./process-run.py -l 5:100,5:100</code></strong></p>
+
+Produce a trace of what would happen when you run these processes:
+
+Process 0
+  cpu
+  cpu
+  cpu
+  cpu
+  cpu
+
+Process 1
+  cpu
+  cpu
+  cpu
+  cpu
+  cpu
+
+Important behaviors:
+  System will switch when the current process is FINISHED or ISSUES AN IO
+  After IOs, the process issuing the IO will run LATER (when it is its turn)
+  </pre>
+</details>
+
+  <p><strong><code>!./process-run.py -l 5:100,5:100 -c -p </code></strong></p>
+
+  <pre>
+Time        PID: 0        PID: 1           CPU           IOs
+  1        RUN:cpu         READY             1          
+  2        RUN:cpu         READY             1          
+  3        RUN:cpu         READY             1          
+  4        RUN:cpu         READY             1          
+  5        RUN:cpu         READY             1          
+  6           DONE       RUN:cpu             1          
+  7           DONE       RUN:cpu             1          
+  8           DONE       RUN:cpu             1          
+  9           DONE       RUN:cpu             1          
+ 10           DONE       RUN:cpu             1          
+
+Stats: Total Time 10
+Stats: CPU Busy 10 (100.00%)
+Stats: IO Busy  0 (0.00%)
+ </pre>
+</details>
+
+
    <details>
    <summary>Answer</summary>
    Since we have 10 processes and no input/output instruction, the CPU utilization should be 100% of the execution time, and we know this because when we use the -c and -p flags, they show us the statistics and the usage time.
@@ -34,14 +83,84 @@ This program, [`process-run.py`](process-run.py), allows you to see how process 
 2. Now run with these flags: `./process-run.py -l 4:100,1:0`. These flags specify one process with 4 instructions (all to use the CPU), and one that simply issues an I/O and waits for it to be done. How long does it take to complete both processes? Use `-c` and `-p` to find out if you were right. 
    
    <details>
+  <summary>Results</summary>
+
+  <p><strong><code>!./process-run.py -l 4:100,1:0</code></strong></p>
+ <pre>
+  Produce a trace of what would happen when you run these processes:
+Process 0
+  cpu
+  cpu
+  cpu
+  cpu
+
+Process 1
+  io
+  io_done
+
+Important behaviors:
+  System will switch when the current process is FINISHED or ISSUES AN IO
+  After IOs, the process issuing the IO will run LATER (when it is its turn)
+  </pre>
+  </details>
+   
+   
+  <p><strong><code>!./process-run.py -l 4:100,1:0 -c -p </code></strong></p>
+
+  <pre>
+Time        PID: 0        PID: 1           CPU           IOs
+  1        RUN:cpu         READY             1          
+  2        RUN:cpu         READY             1          
+  3        RUN:cpu         READY             1          
+  4        RUN:cpu         READY             1          
+  5           DONE        RUN:io             1          
+  6           DONE       BLOCKED                           1
+  7           DONE       BLOCKED                           1
+  8           DONE       BLOCKED                           1
+  9           DONE       BLOCKED                           1
+ 10           DONE       BLOCKED                           1
+ 11*          DONE   RUN:io_done             1          
+
+Stats: Total Time 11
+Stats: CPU Busy 6 (54.55%)
+Stats: IO Busy  5 (45.45%)
+ </pre>
+</details>
+<details>
    <summary>Answer</summary>
    The time it takes for both processes to complete is 11 cycles. 6 in CPU (54.55%) and 5 in IO (45.45%)
+   
    </details>
    <br>
 
+
 3. Switch the order of the processes: `-l 1:0,4:100`. What happens now? Does switching the order matter? Why? (As always, use `-c` and `-p` to see if you were right)
+
+   <details>
+  <summary>Results</summary>
+
+    <p><strong><code>!./process-run.py -l 1:0,4:100 </code></strong></p>
+
+  <pre>
+Produce a trace of what would happen when you run these processes:
+Process 0
+  io
+  io_done
+
+Process 1
+  cpu
+  cpu
+  cpu
+  cpu
+
+Important behaviors:
+  System will switch when the current process is FINISHED or ISSUES AN IO
+  After IOs, the process issuing the IO will run LATER (when it is its turn)
+ </pre>
+</details>
    
    <details>
+   
    <summary>Answer</summary>
    Processes are executed in fewer cycle times. Yes, the change in order matters because the process performing the IO was executed first and blocked quickly, making it switch faster to the CPU process, reducing the execution period and increasing CPU utilization, improving overall system performance.
    </details>
@@ -50,6 +169,8 @@ This program, [`process-run.py`](process-run.py), allows you to see how process 
 4. We'll now explore some of the other flags. One important flag is `-S`, which determines how the system reacts when a process issues an I/O. With the flag set to SWITCH ON END, the system will NOT switch to another process while one is doing I/O, instead waiting until the process is completely finished. What happens when you run the following two processes (`-l 1:0,4:100 -c -S SWITCH ON END`), one doing I/O and the other doing CPU work?
    
    <details>
+   <summary>Results</summary>
+
    <summary>Answer</summary>
     Due to the use of SWITCH ON END, the execution time is extended to 11 cycles, which is unnecessarily long and less efficient, since we force the CPU to execute the IO processes first until they are completely finished, and once finished, continue with the other processes, i.e., the CPU processes.
    </details>
@@ -58,22 +179,28 @@ This program, [`process-run.py`](process-run.py), allows you to see how process 
 5. Now, run the same processes, but with the switching behavior set to switch to another process whenever one is WAITING for I/O (`-l 1:0,4:100 -c -S SWITCH ON IO`). What happens now? Use `-c` and `-p` to confirm that you are right.
    
    <details>
+   <summary>Results</summary>
+
    <summary>Answer</summary>
-   **Answer:** Due to the use of the SWITCH ON IO, the answer obtained is the same as the answer to question 3, because the SWITCH ON IO flag is preconfigured, i.e., regardless of whether it is used or not, the IO processes will always be executed first, as long as they are in the command first. Example: 1:0,4:100
+   Due to the use of the SWITCH ON IO, the answer obtained is the same as the answer to question 3, because the SWITCH ON IO flag is preconfigured, i.e., regardless of whether it is used or not, the IO processes will always be executed first, as long as they are in the command first. Example: 1:0,4:100
    </details>
    <br>
 
 6. One other important behavior is what to do when an I/O completes. With `-I IO RUN LATER`, when an I/O completes, the process that issued it is not necessarily run right away; rather, whatever was running at the time keeps running. What happens when you run this combination of processes? (`./process-run.py -l 3:0,5:100,5:100,5:100 -S SWITCH ON IO -c -p -I IO RUN LATER`) Are system resources being effectively utilized?
    
    <details>
+   <summary>Results</summary>
+
    <summary>Answer</summary>
-   **Answer:** When we execute this combination of processes, which include the SIWTCH ON IO and IO RUN LATER flags, we lose the execution priority of the IO processes as a block and we obtain a partial execution, in this way, 1 of 3 IO processes is executed, and when identifying that a CPU process is in execution, the IO is put in standby and executes the CPU, this thanks to the IO RUN LATER flag. So, we can say that the resources are not being used efficiently, since the CPU was idle for quite some time.
+When we execute this combination of processes, which include the SIWTCH ON IO and IO RUN LATER flags, we lose the execution priority of the IO processes as a block and we obtain a partial execution, in this way, 1 of 3 IO processes is executed, and when identifying that a CPU process is in execution, the IO is put in standby and executes the CPU, this thanks to the IO RUN LATER flag. So, we can say that the resources are not being used efficiently, since the CPU was idle for quite some time.
    </details>
    <br>
 
 7. Now run the same processes, but with `-I IO RUN IMMEDIATE` set, which immediately runs the process that issued the I/O. How does this behavior differ? Why might running a process that just completed an I/O again be a good idea?
    
    <details>
+   <summary>Results</summary>
+
    <summary>Answer</summary>
     With respect to the previous execution, the results differ, since the LATER RUN puts the IO processes on hold (which affects the execution time and does not make good use of resources), while the IMIMMEDIATE RUN, being an immediate process, takes the IO processes as a priority (without leaving them on hold), and unless the CPU processes encounter a io_done, they will not stop, but will continue to run simultaneously, therefore, this process turns out to be more efficient. We can consider this a good practice because there are always processes running, which improves response time (evidenced by the reduction of time cycles), makes the most of the CPU and also allows IO processes not to have to wait.
    </details>
